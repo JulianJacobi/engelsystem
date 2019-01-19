@@ -11,7 +11,7 @@ class ImportChangesNisacon extends Migration
      */
     public function up()
     {
-        $sql = file_get_contents(__DIR__ . '/../changed_nisacon.sql');
+        $sql = file_get_contents(__DIR__ . '/../changes_nisacon.sql');
         $this->schema->getConnection()->unprepared($sql);
     }
 
@@ -20,15 +20,7 @@ class ImportChangesNisacon extends Migration
      */
     public function down()
     {
-        $this->schema->getConnection()->unprepared('
-            ALTER TABLE `users`            
-                DROP COLUMN `street`,
-                DROP COLUMN `zip_code`,
-                DROP COLUMN `emergency_contact`,
-                DROP COLUMN `emergency_contact_phone`,
-                DROP COLUMN `allergies`,
-                DROP COLUMN `medicines`,
-                DROP COLUMN `date_of_birth`;
-        ');
+        $sql = file_get_contents(__DIR__ . '/../changes_nisacon_down.sql');
+        $this->schema->getConnection()->unprepared($sql);
     }
 }

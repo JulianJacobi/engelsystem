@@ -54,8 +54,8 @@ function guest_register()
     $dect = '';
     $mobile = '';
     $mail = '';
-    $email_shiftinfo = false;
-    $email_by_human_allowed = false;
+    $email_shiftinfo = true;
+    $email_by_human_allowed = true;
     $tshirt_size = '';
     $password_hash = '';
     $selected_angel_types = [];
@@ -268,7 +268,7 @@ function guest_register()
     }
 
     return page_with_title(register_title(), [
-        __('By completing this form you\'re registering as a Chaos-Angel. This script will create you an account in the angel task scheduler.'),
+        __('By completing this form you\'re registering as a NiSa-Con volunteer. This script will create you an account in the angel task scheduler.'),
         $msg,
         msg(),
         form([
@@ -334,9 +334,11 @@ function guest_register()
                 ]),
                 div('col-md-6', [
                     div('row', [
+                        /*
                         div('col-sm-4', [
                             form_text('dect', __('DECT'), $dect)
                         ]),
+                        */
                         div('col-sm-4', [
                             form_text('mobile', __('Mobile'), $mobile)
                         ]),
