@@ -9,3 +9,6 @@ ALTER TABLE `users_personal_data`
   DROP COLUMN `date_of_birth`,
   DROP COLUMN `allergies`,
   DROP COLUMN `medicines`;
+
+ALTER TABLE `users_state`
+  DROP COLUMN `unlocked`;
