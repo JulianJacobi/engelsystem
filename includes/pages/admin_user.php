@@ -52,10 +52,14 @@ function admin_user()
         $html .= '  <tr><td>Last login</td><td><p class="help-block">'
             . ($user_source->last_login_at ? $user_source->last_login_at->format('Y-m-d H:i') : '-')
             . '</p></td></tr>' . "\n";
+        $html .= '  <tr><td>Geburtsdatum</td><td><p>' . ($user_source->personalData->date_of_birth ? $user_source->personalData->date_of_birth->format('d.m.Y') . ' | Alter: ' . $user_source->personalData->date_of_birth->diff(Carbon\Carbon::now())->y : '-') . '</p></td></tr>' . "\n";
         $html .= '  <tr><td>Name</td><td>' . '<input size="40" name="eName" value="' . $user_source->personalData->last_name . '" class="form-control"></td></tr>' . "\n";
         $html .= '  <tr><td>Vorname</td><td>' . '<input size="40" name="eVorname" value="' . $user_source->personalData->first_name . '" class="form-control"></td></tr>' . "\n";
+        $html .= '  <tr><td>Straße + Hausnummer</td><td><input size="40" name="eStreet" value="' . $user_source->contact->street . '" class="form-control"></td></tr>' . "\n";
+        $html .= '  <tr><td>Postleitzahl</td><td><input size="40" name="eZipCode" value="' . $user_source->contact->zip_code . '" class="form-control"></td></tr>' . "\n";
+        $html .= '  <tr><td>Stadt</td><td><input size="40" name="eHometown" value="' . $user_source->contact->hometown . '" class="form-control"></td></tr>' . "\n";
         $html .= '  <tr><td>Handy</td><td>' . '<input type= "tel" size="40" name="eHandy" value="' . $user_source->contact->mobile . '" class="form-control"></td></tr>' . "\n";
-        $html .= '  <tr><td>DECT</td><td>' . '<input size="40" name="eDECT" value="' . $user_source->contact->dect . '" class="form-control"></td></tr>' . "\n";
+        //$html .= '  <tr><td>DECT</td><td>' . '<input size="40" name="eDECT" value="' . $user_source->contact->dect . '" class="form-control"></td></tr>' . "\n";
         if ($user_source->settings->email_human) {
             $html .= "  <tr><td>email</td><td>" . '<input type="email" size="40" name="eemail" value="' . $user_source->email . '" class="form-control"></td></tr>' . "\n";
         }
@@ -67,6 +71,10 @@ function admin_user()
                 __('Please select...')
             )
             . '</td></tr>' . "\n";
+        $html .= '  <tr><td>Notfallkontakt (Name)</td><td><input size="40" name="eEmergencyContact" value="' . $user_source->contact->emergency_contact . '" class="form-control"></td></tr>'. "\n";
+        $html .= '  <tr><td>Notfallkontakt (Telefon)</td><td><input size="40" name="eEmergencyContactPhone" value="' . $user_source->contact->emergency_contact_phone . '" class="form-control"></td></tr>'. "\n";
+        $html .= '  <tr><td>Allergien</td><td><textarea name="eAllergies" cols="50" rows="5">' . $user_source->personalData->allergies . '</textarea></td></tr>' . "\n";
+        $html .= '  <tr><td>Medikamente</td><td><textarea name="eMedicines" cols="50" rows="5">' . $user_source->personalData->medicines . '</textarea></td></tr>' . "\n";
 
         $options = [
             '1' => __('Yes'),
@@ -264,9 +272,16 @@ function admin_user()
                 $user_source->personalData->first_name = $request->postData('eVorname');
                 $user_source->personalData->last_name = $request->postData('eName');
                 $user_source->personalData->shirt_size = $request->postData('eSize');
+                $user_source->personalData->allergies = strip_request_item_nl('eAllergies');
+                $user_source->personalData->medicines = strip_request_item_nl('eMedicines');
                 $user_source->personalData->save();
                 $user_source->contact->mobile = $request->postData('eHandy');
                 $user_source->contact->dect = $request->postData('eDECT');
+                $user_source->contact->street = $request->postData('eStreet');
+                $user_source->contact->zip_code = $request->postData('eZipCode');
+                $user_source->contact->hometown = $request->postData('eHometown');
+                $user_source->contact->emergency_contact = $request->postData('eEmergencyContact');
+                $user_source->contact->emergency_contact_phone = $request->postData('eEmergencyContactPhone');
                 $user_source->contact->save();
                 $user_source->state->active = $request->postData('eAktiv');
                 $user_source->state->force_active = $force_active;

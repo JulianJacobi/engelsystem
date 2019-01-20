@@ -2857,8 +2857,8 @@ msgstr ""
 #~ msgid "Please check your jabber account information."
 #~ msgstr "Bitte überprüfe deine Jabber Account Eingabe."
 
-#~ msgid "Phone"
-#~ msgstr "Telefon"
+#: msgid "Phone"
+#: msgstr "Telefon"
 
 #~ msgid "Age"
 #~ msgstr "Alter"
@@ -2894,3 +2894,52 @@ msgstr ""
 #~ msgstr ""
 #~ "Diese Seite existiert nicht oder Du hast keinen Zugriff. Melde Dich an um "
 #~ "Zugriff zu erhalten!"
+
+msgid ""
+"By completing this form you're registering as a NiSa-Con volunteer. This script "
+"will create you an account in the angel task scheduler."
+msgstr ""
+"Mit diesem Formular registrierst Du Dich als NiSa-Con Helfer. Du bekommst ein Konto in "
+"der Helfer-Aufgabenverwaltung."
+
+msgid "Birthday"
+msgstr "Geburtsdatum"
+
+msgid "Street + Nr."
+msgstr "Straße + Hausnummer"
+
+msgid "Zip Code"
+msgstr "PLZ"
+
+msgid "Town"
+msgstr "Stadt"
+
+msgid "Allergies"
+msgstr "Allergien"
+
+msgid "Medicines"
+msgstr "Medikamente"
+
+msgid "Emergency contact"
+msgstr "Notfallkontakt"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Please enter your full address."
+msgstr "Bitte gib deine komplette Adresse an."
+
+msgid "Please enter an emergency contact."
+msgstr "Bitte gib einen Notfallkontakt an."
+
+msgid "Please enter your birthday."
+msgstr "Bitte gib deinen Geburtstag an."
+
+msgid "Please enter your first name."
+msgstr "Bitte gib deinen Vornamen an."
+
+msgid "Please enter your last name."
+msgstr "Bitte gib deinen Nachnamen an."
+
+msgid "Please enter your mobile number."
+msgstr "Bitte gib deine Handynummer an."

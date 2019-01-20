@@ -8,12 +8,18 @@ namespace Engelsystem\Models\User;
  * @property string|null         $shirt_size
  * @property \Carbon\Carbon|null $planned_arrival_date
  * @property \Carbon\Carbon|null $planned_departure_date
+ * @property \Carbon\Carbon|null $date_of_birth
+ * @property string|null         $allergies
+ * @property string|null         $medicines
  *
  * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\PersonalData[] whereFirstName($value)
  * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\PersonalData[] whereLastName($value)
  * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\PersonalData[] whereShirtSize($value)
  * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\PersonalData[] wherePlannedArrivalDate($value)
  * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\PersonalData[] wherePlannedDepartureDate($value)
+ * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\PersonalData[] whereDateOfBirth($value)
+ * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\PersonalData[] whereAllergies($value)
+ * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\PersonalData[] whereMedicines($value)
  */
 class PersonalData extends HasUserModel
 {
@@ -24,6 +30,7 @@ class PersonalData extends HasUserModel
     protected $dates = [
         'planned_arrival_date',
         'planned_departure_date',
+        'date_of_birth',
     ];
 
     /** The attributes that are mass assignable. */
@@ -34,5 +41,8 @@ class PersonalData extends HasUserModel
         'shirt_size',
         'planned_arrival_date',
         'planned_departure_date',
+        'date_of_birth',
+        'allergies',
+        'medicines',
     ];
 }

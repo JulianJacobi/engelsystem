@@ -61,6 +61,15 @@ function guest_register()
     $selected_angel_types = [];
     $planned_arrival_date = null;
 
+    $street = '';
+    $hometown = '';
+    $zip_code = '';
+    $emergency_contact = '';
+    $emergency_contact_phone = '';
+    $allergies = '';
+    $medicines = '';
+    $date_of_birth = '';
+
     $angel_types_source = AngelTypes();
     $angel_types = [];
     foreach ($angel_types_source as $angel_type) {
@@ -160,12 +169,60 @@ function guest_register()
             }
         }
 
-        // Trivia
+        if ($request->has('street')) {
+            $street = strip_request_item('street');
+        } else {
+            $valid = false;
+            error(__('Please enter your full address.'));
+        }
+
+        if ($request->has('zip_code')) {
+            $zip_code = strip_request_item('zip_code');
+        } else {
+            $valid = false;
+            error(__('Please enter your full address.'));
+        }
+
+        if ($request->has('hometown')) {
+            $hometown = strip_request_item('hometown');
+        } else {
+            $valid = false;
+            error(__('Please enter your full address.'));
+        }
+
+        if ($request->has('emergency_contact')) {
+            $emergency_contact = strip_request_item('emergency_contact');
+        } else {
+            $valid = false;
+            error(__('Please enter an emergency contact.'));
+        }
+
+        if ($request->has('emergency_contact_phone')) {
+            $emergency_contact_phone = strip_request_item('emergency_contact_phone');
+        } else {
+            $valid = false;
+            error(__('Please enter an emergency contact.'));
+        }
+
+        if ($request->has('date_of_birth')) {
+            $date_of_birth = parse_date('Y-m-d H:i', $request->input('date_of_birth') . ' 00:00');
+        } else {
+            $valid = false;
+            error(__('Please enter your birthday.'));
+        }
+
+
         if ($request->has('lastname')) {
             $lastName = strip_request_item('lastname');
+        } else {
+            $valid = false;
+            error(__('Please enter your last name.'));
         }
         if ($request->has('prename')) {
             $preName = strip_request_item('prename');
+        } else {
+            $valid = false;
+            error(__('Please enter your first name.'));
         }
         if ($request->has('dect')) {
             if (strlen(strip_request_item('dect')) <= 40) {
@@ -177,6 +234,17 @@ function guest_register()
         }
         if ($request->has('mobile')) {
             $mobile = strip_request_item('mobile');
+        } else {
+            $valid = false;
+            error(__('Please enter your mobile number.'));
+        }
+
+        // Trivia
+        if ($request->has('allergies')) {
+            $allergies = strip_request_item_nl('allergies');
+        }
+        if ($request->has('medicines')) {
+            $medicines = strip_request_item_nl('medicines');
         }
 
         if ($valid) {
@@ -192,6 +260,11 @@ function guest_register()
             $contact = new Contact([
                 'dect'   => $dect,
                 'mobile' => $mobile,
+                'hometown'                => $hometown,
+                'street'                  => $street,
+                'zip_code'                => $zip_code,
+                'emergency_contact'       => $emergency_contact,
+                'emergency_contact_phone' => $emergency_contact_phone,
             ]);
             $contact->user()
                 ->associate($user)
@@ -202,6 +275,9 @@ function guest_register()
                 'last_name'            => $lastName,
                 'shirt_size'           => $tshirt_size,
                 'planned_arrival_date' => Carbon::createFromTimestamp($planned_arrival_date),
+                'date_of_birth'        => Carbon::createFromTimestamp($date_of_birth),
+                'allergies'            => $allergies,
+                'medicines'            => $medicines,
             ]);
             $personalData->user()
                 ->associate($user)
@@ -339,17 +415,50 @@ function guest_register()
                             form_text('dect', __('DECT'), $dect)
                         ]),
                         */
-                        div('col-sm-4', [
-                            form_text('mobile', __('Mobile'), $mobile)
+                        div('col-sm-6', [
+                            form_text('mobile', __('Mobile') . ' ' . entry_required(), $mobile)
+                        ]),
+                        div('col-sm-6', [
+                            form_date('date_of_birth', __('Birthday') . ' ' . entry_required(), $date_of_birth)
                         ]),
                     ]),
                     div('row', [
                         div('col-sm-6', [
-                            form_text('prename', __('First name'), $preName)
+                            form_text('prename', __('First name') . ' ' . entry_required(), $preName)
                         ]),
                         div('col-sm-6', [
-                            form_text('lastname', __('Last name'), $lastName)
+                            form_text('lastname', __('Last name') . ' ' . entry_required(), $lastName)
                         ])
+                    ]),
+                    div('row', [
+                        div('col-sm-12', [
+                            form_text('street', __('Street + Nr.') . ' ' . entry_required(), $street)
+                        ]),
+                    ]),
+                    div('row', [
+                        div('col-sm-3', [
+                            form_text('zip_code', __('Zip Code') . ' ' . entry_required(), $zip_code)
+                        ]),
+                        div('col-sm-9', [
+                            form_text('hometown', __('Town') . ' ' . entry_required(), $hometown)
+                        ]),
+                    ]),
+                    div('row', [
+                        div('col-sm-6', [
+                            form_textarea('allergies', __('Allergies'), $allergies)
+                        ]),
+                        div('col-sm-6', [
+                            form_textarea('medicines', __('Medicines'), $medicines)
+                        ]),
+                    ]),
+                    form_info(__("Emergency contact")),
+                    div('row', [
+                        div('col-sm-12', [
+                            form_text('emergency_contact', __('Name') . ' ' . entry_required(), $emergency_contact)
+                        ]),
+                        div( 'col-sm-12', [
+                            form_text('emergency_contact_phone', __('Phone') . ' ' . entry_required(), $emergency_contact_phone)
+                        ]),
                     ]),
                     form_info(entry_required() . ' = ' . __('Entry required!'))
                 ])

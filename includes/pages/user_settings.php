@@ -69,16 +69,75 @@ function user_settings_main($user_source, $enable_tshirt_size, $tshirt_sizes)
         }
     }
 
-    // Trivia
-    $user_source->personalData->last_name = strip_request_item('lastname', $user_source['Name']);
-    $user_source->personalData->first_name = strip_request_item('prename', $user_source['Vorname']);
+    if ($request->has('lastname')) {
+        $user_source->personalData->last_name = strip_request_item('lastname', $user_source['Name']);
+    } else {
+        $valid = false;
+        error(__('Please enter your last name.'));
+    }
+    if ($request->has('prename')) {
+        $user_source->personalData->first_name = strip_request_item('prename', $user_source['Vorname']);
+    } else {
+        $valid = false;
+        error(__('Please enter your first name.'));
+    }
     if (strlen(strip_request_item('dect')) <= 40) {
         $user_source->contact->dect = strip_request_item('dect', $user_source['DECT']);
     } else {
         $valid = false;
         error(__('For dect numbers are only 40 digits allowed.'));
     }
-    $user_source->contact->mobile = strip_request_item('mobile', $user_source['Handy']);
+    if ($request->has('mobile')) {
+        $user_source->contact->mobile = strip_request_item('mobile', $user_source['Handy']);
+    } else {
+        $valid = false;
+        error(__('Please enter your mobile number.'));
+    }
+    if ($request->has('street')) {
+        $user_source->contact->street = strip_request_item('street', $user_source->contact->street);
+    } else {
+        $valid = false;
+        error(__('Please enter your full address.'));
+    }
+
+    if ($request->has('zip_code')) {
+        $user_source->contact->zip_code = strip_request_item('zip_code', $user_source->contact->zip_code);
+    } else {
+        $valid = false;
+        error(__('Please enter your full address.'));
+    }
+
+    if ($request->has('hometown')) {
+        $user_source->contact->hometown = strip_request_item('hometown', $user_source->contact->hometown);
+    } else {
+        $valid = false;
+        error(__('Please enter your full address.'));
+    }
+
+    if ($request->has('emergency_contact')) {
+        $user_source->contact->emergency_contact = strip_request_item('emergency_contact', $user_source->contact->emergency_contact);
+    } else {
+        $valid = false;
+        error(__('Please enter an emergency contact.'));
+    }
+    if ($request->has('emergency_contact_phone')) {
+        $user_source->contact->emergency_contact_phone = strip_request_item('emergency_contact_phone', $user_source->contact->emergency_contact_phone);
+    } else {
+        $valid = false;
+        error(__('Please enter an emergency contact.'));
+    }
+
+    if ($request->has('date_of_birth')) {
+        $user_source->personalData->date_of_birth = parse_date('Y-m-d H:i', $request->input('date_of_birth') . ' 00:00');
+    } else {
+        $valid = false;
+        error(__('Please enter your birthday.'));
+    }
+
+    // Trivia
+    $user_source->personalData->allergies = strip_request_item('allergies', $user_source->personalData->allergies);
+    $user_source->personalData->medicines = strip_request_item('medicines', $user_source->personalData->medicines);
+
 
     if ($valid) {
         $user_source->save();

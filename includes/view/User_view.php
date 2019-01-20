@@ -33,8 +33,16 @@ function User_settings_view(
                     form_info('', __('Here you can change your user details.')),
                     form_info(entry_required() . ' = ' . __('Entry required!')),
                     form_text('nick', __('Nick'), $user_source->name, true),
-                    form_text('lastname', __('Last name'), $personalData->last_name),
-                    form_text('prename', __('First name'), $personalData->first_name),
+                    form_text('lastname', __('Last name') . ' ' . entry_required(), $personalData->last_name),
+                    form_text('prename', __('First name') . ' ' . entry_required(), $personalData->first_name),
+                    form_text('street', __('Street + Nr.') . ' ' . entry_required(), $user_source->contact->street),
+                    form_text('zip_code', __('Zip Code') . ' ' . entry_required(), $user_source->contact->zip_code),
+                    form_text('hometown', __('Town') . ' ' . entry_required(), $user_source->contact->hometown),
+                    form_date(
+                        'date_of_birth',
+                        __('Birthday') . ' ' . entry_required(),
+                        $personalData->date_of_birth ? $personalData->date_of_birth->getTimestamp() : ''
+                    ),
                     form_date(
                         'planned_arrival_date',
                         __('Planned date of arrival') . ' ' . entry_required(),
@@ -49,8 +57,8 @@ function User_settings_view(
                         $buildup_start_date,
                         $teardown_end_date
                     ),
-                    form_text('dect', __('DECT'), $user_source->contact->dect),
-                    form_text('mobile', __('Mobile'), $user_source->contact->mobile),
+                    # form_text('dect', __('DECT'), $user_source->contact->dect),
+                    form_text('mobile', __('Mobile') . ' ' . entry_required(), $user_source->contact->mobile),
                     form_text('mail', __('E-Mail') . ' ' . entry_required(), $user_source->email),
                     form_checkbox(
                         'email_shiftinfo',
@@ -72,6 +80,11 @@ function User_settings_view(
                         $personalData->shirt_size,
                         __('Please select...')
                     ) : '',
+                    form_textarea('allergies', __('Allergies'), $personalData->allergies),
+                    form_textarea('medicines', __('Medicines'), $personalData->medicines),
+                    form_info(__('Emergency contact')),
+                    form_text('emergency_contact', __('Name') . ' ' . entry_required(), $user_source->contact->emergency_contact),
+                    form_text('emergency_contact_phone', __('Phone') . ' ' . entry_required(), $user_source->contact->emergency_contact_phone),
                     form_info('', __('Please visit the angeltypes page to manage your angeltypes.')),
                     form_submit('submit', __('Save'))
                 ])
