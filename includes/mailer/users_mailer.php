@@ -40,3 +40,19 @@ function mail_user_locked($user)
         )
     );
 }
+
+function mail_user_news($subject, $message)
+{
+    $users = User::all();
+
+    foreach ($users as $user) {
+        /** @var User $user */
+        if ($user->state->unlocked && $user->settings->email_human) {
+            engelsystem_email_to_user(
+                $user,
+                $subject,
+                $message
+            );
+        }
+    }
+}

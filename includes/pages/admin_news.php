@@ -47,6 +47,7 @@ function admin_news()
                     form_text('eBetreff', __('Subject'), $news['Betreff']),
                     form_textarea('eText', __('Message'), $news['Text']),
                     form_checkbox('eTreffen', __('Meeting'), $news['Treffen'] == 1, 1),
+                    form_checkbox('eSendMail', __('Send Mail to unlocked Angels'), false, 1),
                     form_submit('submit', __('Save'))
                 ],
                 page_link_to('admin_news', ['action' => 'save', 'id' => $news_id])
@@ -83,6 +84,10 @@ function admin_news()
                     $news_id
                 ]
             );
+
+            if ($request->has('eSendMail') && $request->postData('eSendMail') == '1') {
+                mail_user_news(__('Update:') . ' ' . strip_tags($request->postData('eBetreff')), $text);
+            }
 
             engelsystem_log('News updated: ' . $request->postData('eBetreff'));
             success(__('News entry updated.'));

@@ -2971,3 +2971,6 @@ msgid ""
 msgstr ""
 "Dein Account wurde gesperrt. Wenn du Fragen zu dieser "
 "Sperrung hast setze dich bitte mit uns in Verbindung."
+
+msgid "Send Mail to unlocked Angels"
+msgstr "Mail an freigeschaltete Engel senden"

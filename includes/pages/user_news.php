@@ -225,6 +225,10 @@ function user_news()
             ]
         );
 
+        if ($request->has('send_mail') && $request->postData('send_mail') == '1') {
+            mail_user_news(strip_tags($request->postData('betreff')), $text);
+        }
+
         engelsystem_log('Created news: ' . $request->postData('betreff') . ', treffen: ' . $isMeeting);
         success(__('Entry saved.'));
         redirect(page_link_to('news'));
@@ -271,6 +275,7 @@ function user_news()
             form_text('betreff', __('Subject'), ''),
             form_textarea('text', __('Message'), ''),
             form_checkbox('treffen', __('Meeting'), false, 1),
+            form_checkbox('send_mail', __('Send Mail to unlocked Angels'), false, 1),
             form_submit('submit', __('Save'))
         ]);
     }
