@@ -283,6 +283,24 @@ function users_list_controller()
         $order_by = $request->input('OrderBy');
     }
 
+    if ($request->has('unlock')) {
+        /** @var User $unlock_user */
+        $unlock_user = User::whereId($request->get('unlock'))->first();
+        $unlock_user->state->unlocked = true;
+        $unlock_user->state->save();
+        mail_user_unlocked($unlock_user);
+        redirect(page_link_to('users'));
+    }
+
+    if ($request->has('lock')) {
+        /** @var User $lock_user */
+        $lock_user = User::whereId($request->get('lock'))->first();
+        $lock_user->state->unlocked = false;
+        $lock_user->state->save();
+        mail_user_locked($lock_user);
+        redirect(page_link_to('users'));
+    }
+
     /** @var User[] $users */
     $users = User::query()
         ->leftJoin('users_contact', 'users.id', '=', 'users_contact.user_id')

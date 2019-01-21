@@ -24,7 +24,7 @@ function user_settings_main($user_source, $enable_tshirt_size, $tshirt_sizes)
     $valid = true;
     $request = request();
 
-    if ($request->has('mail')) {
+    if ($request->has('mail') && strlen(User_validate_Nick($request->input('mail'))) > 1) {
         $result = User_validate_mail($request->input('mail'));
         $user_source->email = $result->getValue();
         if (!$result->isValid()) {
@@ -69,13 +69,13 @@ function user_settings_main($user_source, $enable_tshirt_size, $tshirt_sizes)
         }
     }
 
-    if ($request->has('lastname')) {
+    if ($request->has('lastname') && strlen(User_validate_Nick($request->input('lastname'))) > 1) {
         $user_source->personalData->last_name = strip_request_item('lastname', $user_source['Name']);
     } else {
         $valid = false;
         error(__('Please enter your last name.'));
     }
-    if ($request->has('prename')) {
+    if ($request->has('prename') && strlen(User_validate_Nick($request->input('prename'))) > 1) {
         $user_source->personalData->first_name = strip_request_item('prename', $user_source['Vorname']);
     } else {
         $valid = false;
@@ -87,40 +87,40 @@ function user_settings_main($user_source, $enable_tshirt_size, $tshirt_sizes)
         $valid = false;
         error(__('For dect numbers are only 40 digits allowed.'));
     }
-    if ($request->has('mobile')) {
+    if ($request->has('mobile') && strlen(User_validate_Nick($request->input('mobile'))) > 1) {
         $user_source->contact->mobile = strip_request_item('mobile', $user_source['Handy']);
     } else {
         $valid = false;
         error(__('Please enter your mobile number.'));
     }
-    if ($request->has('street')) {
+    if ($request->has('street') && strlen(User_validate_Nick($request->input('street'))) > 1) {
         $user_source->contact->street = strip_request_item('street', $user_source->contact->street);
     } else {
         $valid = false;
         error(__('Please enter your full address.'));
     }
 
-    if ($request->has('zip_code')) {
+    if ($request->has('zip_code') && strlen(User_validate_Nick($request->input('zip_code'))) > 1) {
         $user_source->contact->zip_code = strip_request_item('zip_code', $user_source->contact->zip_code);
     } else {
         $valid = false;
         error(__('Please enter your full address.'));
     }
 
-    if ($request->has('hometown')) {
+    if ($request->has('hometown') && strlen(User_validate_Nick($request->input('hometown'))) > 1) {
         $user_source->contact->hometown = strip_request_item('hometown', $user_source->contact->hometown);
     } else {
         $valid = false;
         error(__('Please enter your full address.'));
     }
 
-    if ($request->has('emergency_contact')) {
+    if ($request->has('emergency_contact') && strlen(User_validate_Nick($request->input('emergency_contact'))) > 1) {
         $user_source->contact->emergency_contact = strip_request_item('emergency_contact', $user_source->contact->emergency_contact);
     } else {
         $valid = false;
         error(__('Please enter an emergency contact.'));
     }
-    if ($request->has('emergency_contact_phone')) {
+    if ($request->has('emergency_contact_phone') && strlen(User_validate_Nick($request->input('emergency_contact_phone'))) > 1) {
         $user_source->contact->emergency_contact_phone = strip_request_item('emergency_contact_phone', $user_source->contact->emergency_contact_phone);
     } else {
         $valid = false;

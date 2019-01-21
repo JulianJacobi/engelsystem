@@ -9,6 +9,7 @@ namespace Engelsystem\Models\User;
  * @property bool                $force_active
  * @property bool                $got_shirt
  * @property int                 $got_voucher
+ * @property bool                $unlocked
  *
  * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\State[] whereArrived($value)
  * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\State[] whereArrivalDate($value)
@@ -16,6 +17,7 @@ namespace Engelsystem\Models\User;
  * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\State[] whereForceActive($value)
  * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\State[] whereGotShirt($value)
  * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\State[] whereGotVoucher($value)
+ * @method static \Illuminate\Database\Query\Builder|\Engelsystem\Models\User\State[] whereUnlocked($value)
  */
 class State extends HasUserModel
 {
@@ -36,5 +38,6 @@ class State extends HasUserModel
         'force_active',
         'got_shirt',
         'got_voucher',
+        'unlocked',
     ];
 }

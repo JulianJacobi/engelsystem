@@ -239,8 +239,10 @@ function Users_view(
         $u['got_shirt'] = glyph_bool($user->state->got_shirt);
         $u['shirt_size'] = $user->personalData->shirt_size;
         $u['last_login_at'] = $user->last_login_at ? $user->last_login_at->format(__('m/d/Y h:i a')) : '';
+        $u['unlocked'] = glyph_bool($user->state->unlocked);
         $u['actions'] = table_buttons([
-            button_glyph(page_link_to('admin_user', ['id' => $user->id]), 'edit', 'btn-xs')
+            button_glyph(page_link_to('admin_user', ['id' => $user->id]), 'edit', 'btn-xs'),
+            $user->state->unlocked ? button(page_link_to('users', ['lock' => $user->id]), __('lock'), 'btn-xs') : button(page_link_to('users', ['unlock' => $user->id]), __('unlock'), 'btn-xs'),
         ]);
         $usersList[] = $u;
     }
@@ -273,6 +275,7 @@ function Users_view(
             'got_shirt'     => Users_table_header_link('got_shirt', __('T-Shirt'), $order_by),
             'shirt_size'    => Users_table_header_link('shirt_size', __('Size'), $order_by),
             'last_login_at' => Users_table_header_link('last_login_at', __('Last login'), $order_by),
+            'unlocked'      => Users_table_header_link('unlocked', __('Unlocked'), $order_by),
             'actions'       => ''
         ], $usersList)
     ]);

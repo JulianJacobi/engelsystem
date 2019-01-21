@@ -169,35 +169,35 @@ function guest_register()
             }
         }
 
-        if ($request->has('street')) {
+        if ($request->has('street') && strlen(User_validate_Nick($request->input('street'))) > 1) {
             $street = strip_request_item('street');
         } else {
             $valid = false;
             error(__('Please enter your full address.'));
         }
 
-        if ($request->has('zip_code')) {
+        if ($request->has('zip_code') && strlen(User_validate_Nick($request->input('zip_code'))) > 1) {
             $zip_code = strip_request_item('zip_code');
         } else {
             $valid = false;
             error(__('Please enter your full address.'));
         }
 
-        if ($request->has('hometown')) {
+        if ($request->has('hometown') && strlen(User_validate_Nick($request->input('hometown'))) > 1) {
             $hometown = strip_request_item('hometown');
         } else {
             $valid = false;
             error(__('Please enter your full address.'));
         }
 
-        if ($request->has('emergency_contact')) {
+        if ($request->has('emergency_contact') && strlen(User_validate_Nick($request->input('emergency_contact'))) > 1) {
             $emergency_contact = strip_request_item('emergency_contact');
         } else {
             $valid = false;
             error(__('Please enter an emergency contact.'));
         }
 
-        if ($request->has('emergency_contact_phone')) {
+        if ($request->has('emergency_contact_phone') && strlen(User_validate_Nick($request->input('emergency_contact_phone'))) > 1) {
             $emergency_contact_phone = strip_request_item('emergency_contact_phone');
         } else {
             $valid = false;
@@ -212,13 +212,13 @@ function guest_register()
         }
 
 
-        if ($request->has('lastname')) {
+        if ($request->has('lastname') && strlen(User_validate_Nick($request->input('lastname'))) > 1) {
             $lastName = strip_request_item('lastname');
         } else {
             $valid = false;
             error(__('Please enter your last name.'));
         }
-        if ($request->has('prename')) {
+        if ($request->has('prename') && strlen(User_validate_Nick($request->input('prename'))) > 1) {
             $preName = strip_request_item('prename');
         } else {
             $valid = false;
@@ -232,7 +232,7 @@ function guest_register()
                 error(__('For dect numbers are only 40 digits allowed.'));
             }
         }
-        if ($request->has('mobile')) {
+        if ($request->has('mobile') && strlen(User_validate_Nick($request->input('mobile'))) > 1) {
             $mobile = strip_request_item('mobile');
         } else {
             $valid = false;
@@ -501,6 +501,7 @@ function guest_login()
     if ($request->hasPostData('submit')) {
         if ($request->has('nick') && strlen(User_validate_Nick($request->input('nick'))) > 0) {
             $nick = User_validate_Nick($request->input('nick'));
+            /** @var User $login_user */
             $login_user = User::whereName($nick)->first();
             if ($login_user) {
                 if ($request->has('password')) {
@@ -516,6 +517,12 @@ function guest_login()
                 $valid = false;
                 error(__('No user was found with that Nickname. Please try again. If you are still having problems, ask a Dispatcher.'));
             }
+
+            if (!$login_user->state->unlocked) {
+                $valid = false;
+                error(__('Your account is currently locked, before you can login to the system you must be unlocked by one of our admins.'));
+            }
+
         } else {
             $valid = false;
             error(__('Please enter a nickname.'));
