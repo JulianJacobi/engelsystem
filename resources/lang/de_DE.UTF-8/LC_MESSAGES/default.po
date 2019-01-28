@@ -2974,3 +2974,6 @@ msgstr ""
 
 msgid "Send Mail to unlocked Angels"
 msgstr "Mail an freigeschaltete Engel senden"
+
+msgid "Show on public area"
+msgstr "Öffentlich zeigen"

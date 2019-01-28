@@ -112,6 +112,9 @@ function AngelType_edit_view($angeltype, $supporter_mode)
             form_text('contact_name', __('Name'), $angeltype['contact_name']),
             form_text('contact_dect', __('DECT'), $angeltype['contact_dect']),
             form_text('contact_email', __('E-Mail'), $angeltype['contact_email']),
+            $supporter_mode
+                ? form_info(__('Show on public area'), $angeltype['public_contact'])
+                : form_checkbox('public_contact', __('Show on public area'), $angeltype['public_contact']),
             form_submit('submit', __('Save'))
         ])
     ]);
@@ -517,7 +520,7 @@ function AngelTypes_about_view_angeltype($angeltype)
 
     $html = '<h2>' . $angeltype['name'] . '</h2>';
 
-    if (AngelType_has_contact_info($angeltype)) {
+    if (AngelType_has_contact_info($angeltype) &&( auth()->user() || $angeltype['public_contact'])) {
         $html .= AngelTypes_render_contact_info($angeltype);
     }
 

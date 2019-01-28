@@ -149,6 +149,8 @@ function angeltype_edit_controller()
         $angeltype['contact_dect'] = strip_request_item('contact_dect', $angeltype['contact_dect']);
         $angeltype['contact_email'] = strip_request_item('contact_email', $angeltype['contact_email']);
 
+        $angeltype['public_contact'] = $request->has('public_contact');
+
         if ($valid) {
             if (!empty($angeltype['id'])) {
                 AngelType_update($angeltype);

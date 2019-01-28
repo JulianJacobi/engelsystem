@@ -19,7 +19,8 @@ function AngelType_new()
         'contact_name'            => null,
         'contact_dect'            => null,
         'contact_email'           => null,
-        'show_on_dashboard'       => true
+        'show_on_dashboard'       => true,
+        'public_contact'          => true,
     ];
 }
 
@@ -68,7 +69,8 @@ function AngelType_update($angeltype)
           `contact_name` = ?,
           `contact_dect` = ?,
           `contact_email` = ?,
-          `show_on_dashboard` = ?
+          `show_on_dashboard` = ?,
+          `public_contact` = ?
           WHERE `id` = ?',
         [
             $angeltype['name'],
@@ -80,6 +82,7 @@ function AngelType_update($angeltype)
             $angeltype['contact_dect'],
             $angeltype['contact_email'],
             (int)$angeltype['show_on_dashboard'],
+            (int)$angeltype['public_contact'],
             $angeltype['id'],
         ]
     );
@@ -113,9 +116,10 @@ function AngelType_create($angeltype)
               `contact_name`,
               `contact_dect`,
               `contact_email`,
-              `show_on_dashboard`
+              `show_on_dashboard`,
+              `public_contact`
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ',
         [
             $angeltype['name'],
@@ -126,7 +130,8 @@ function AngelType_create($angeltype)
             $angeltype['contact_name'],
             $angeltype['contact_dect'],
             $angeltype['contact_email'],
-            (int)$angeltype['show_on_dashboard']
+            (int)$angeltype['show_on_dashboard'],
+            (int)$angeltype['public_contact']
         ]
     );
 
