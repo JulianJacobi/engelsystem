@@ -5,6 +5,7 @@ namespace Engelsystem\Test\Unit\Mail\Transport;
 use Engelsystem\Test\Unit\Mail\Transport\Stub\TransportImplementation;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Swift_Events_EventListener;
 use Swift_Mime_SimpleMessage as SimpleMessage;
 
 class TransportTest extends TestCase
@@ -12,13 +13,24 @@ class TransportTest extends TestCase
     /**
      * @covers \Engelsystem\Mail\Transport\Transport::isStarted
      * @covers \Engelsystem\Mail\Transport\Transport::ping
+     * @covers \Engelsystem\Mail\Transport\Transport::registerPlugin
+     * @covers \Engelsystem\Mail\Transport\Transport::start
+     * @covers \Engelsystem\Mail\Transport\Transport::stop
      */
     public function testMethods()
     {
+        /** @var Swift_Events_EventListener|MockObject $plugin */
+        $plugin = $this->getMockForAbstractClass(Swift_Events_EventListener::class);
+
         $transport = new TransportImplementation();
+
+        $transport->start();
+        $transport->registerPlugin($plugin);
 
         $this->assertTrue($transport->isStarted());
         $this->assertTrue($transport->ping());
+
+        $transport->stop();
     }
 
     /**
@@ -58,8 +70,8 @@ class TransportTest extends TestCase
     }
 
     /**
-     * @covers \Engelsystem\Mail\Transport\Transport::getTo
      * @covers \Engelsystem\Mail\Transport\Transport::formatTo
+     * @covers \Engelsystem\Mail\Transport\Transport::getTo
      */
     public function testGetTo()
     {

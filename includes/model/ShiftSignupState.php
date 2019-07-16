@@ -39,6 +39,11 @@ class ShiftSignupState
     const SHIFT_ENDED = 'SHIFT_ENDED';
 
     /**
+     * Shift is not available yet
+     */
+    const NOT_YET = 'NOT_YET';
+
+    /**
      * User is already signed up
      */
     const SIGNED_UP = 'SIGNED_UP';
@@ -88,6 +93,7 @@ class ShiftSignupState
     {
         switch ($state) {
             case ShiftSignupState::NOT_ARRIVED:
+            case ShiftSignupState::NOT_YET:
             case ShiftSignupState::SHIFT_ENDED:
                 return 100;
 
@@ -104,6 +110,7 @@ class ShiftSignupState
             case ShiftSignupState::OCCUPIED:
             case ShiftSignupState::ADMIN:
                 return 60;
+
             default:
                 return 0;
         }

@@ -6,8 +6,8 @@ use Engelsystem\Helpers\Authenticator;
 use Engelsystem\Helpers\Translator;
 use Engelsystem\Http\Request;
 use Engelsystem\Middleware\LegacyMiddleware;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -46,36 +46,28 @@ class LegacyMiddlewareTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $middleware->expects($this->exactly(2))
+        $middleware->expects($this->once())
             ->method('loadPage')
-            ->withConsecutive(['user_worklog'], ['login'])
-            ->willReturnOnConsecutiveCalls(
-                ['title', 'content'],
-                ['title2', 'content2']
-            );
+            ->with('user_worklog')
+            ->willReturn(['title', 'content']);
 
-        $middleware->expects($this->exactly(3))
+        $middleware->expects($this->exactly(2))
             ->method('renderPage')
             ->withConsecutive(
                 ['user_worklog', 'title', 'content'],
-                ['404', 'Page not found', 'It\'s not available!'],
-                ['login', 'title2', 'content2']
+                ['404', 'Page not found', 'It\'s not available!']
             )
             ->willReturn($response);
 
-        $container->expects($this->exactly(4))
+        $container->expects($this->exactly(3))
             ->method('get')
-            ->withConsecutive(['request'], ['request'], ['translator'], ['request'])
+            ->withConsecutive(['request'], ['request'], ['translator'])
             ->willReturnOnConsecutiveCalls(
                 $defaultRequest,
                 $defaultRequest,
-                $translator,
-                $defaultRequest
+                $translator
             );
 
-        $auth->expects($this->atLeastOnce())
-            ->method('user')
-            ->willReturn(false);
         $auth->expects($this->atLeastOnce())
             ->method('can')
             ->willReturn(false);
@@ -92,16 +84,14 @@ class LegacyMiddlewareTest extends TestCase
             ->method('path')
             ->willReturn('user-worklog');
 
-        $parameters->expects($this->exactly(3))
+        $parameters->expects($this->exactly(2))
             ->method('get')
             ->with('p')
             ->willReturnOnConsecutiveCalls(
                 null,
-                'foo',
-                '/'
+                'foo'
             );
 
-        $middleware->process($request, $handler);
         $middleware->process($request, $handler);
         $middleware->process($request, $handler);
     }

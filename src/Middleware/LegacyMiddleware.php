@@ -17,7 +17,6 @@ class LegacyMiddleware implements MiddlewareInterface
     protected $free_pages = [
         'admin_event_config',
         'angeltypes',
-        'api',
         'atom',
         'ical',
         'login',
@@ -29,7 +28,7 @@ class LegacyMiddleware implements MiddlewareInterface
         'users',
         'user_driver_licenses',
         'user_password_recovery',
-        'user_worklog'
+        'user_worklog',
     ];
 
     /** @var ContainerInterface */
@@ -70,9 +69,6 @@ class LegacyMiddleware implements MiddlewareInterface
             $page = $appRequest->path();
             $page = str_replace('-', '_', $page);
         }
-        if ($page == '/') {
-            $page = $this->auth->user() ? 'news' : 'login';
-        }
 
         $title = $content = '';
         if (
@@ -105,10 +101,6 @@ class LegacyMiddleware implements MiddlewareInterface
     {
         $title = ucfirst($page);
         switch ($page) {
-            /** @noinspection PhpMissingBreakStatementInspection */
-            case 'api':
-                error('Api disabled temporarily.');
-                redirect(page_link_to());
             /** @noinspection PhpMissingBreakStatementInspection */
             case 'ical':
                 require_once realpath(__DIR__ . '/../../includes/pages/user_ical.php');
@@ -190,10 +182,6 @@ class LegacyMiddleware implements MiddlewareInterface
             case 'register':
                 $title = register_title();
                 $content = guest_register();
-                return [$title, $content];
-            case 'logout':
-                $title = logout_title();
-                $content = guest_logout();
                 return [$title, $content];
             case 'admin_questions':
                 $title = admin_questions_title();

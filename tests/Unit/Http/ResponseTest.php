@@ -2,8 +2,10 @@
 
 namespace Engelsystem\Test\Unit\Http;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Engelsystem\Http\Response;
 use Engelsystem\Renderer\Renderer;
+use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -11,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class ResponseTest extends TestCase
 {
+    use ArraySubsetAsserts;
+
     /**
      * @covers \Engelsystem\Http\Response
      */
@@ -22,8 +26,8 @@ class ResponseTest extends TestCase
     }
 
     /**
-     * @covers \Engelsystem\Http\Response::withStatus
      * @covers \Engelsystem\Http\Response::getReasonPhrase
+     * @covers \Engelsystem\Http\Response::withStatus
      */
     public function testWithStatus()
     {
@@ -76,9 +80,28 @@ class ResponseTest extends TestCase
      */
     public function testWithViewNoRenderer()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $response = new Response();
         $response->withView('foo');
+    }
+
+    /**
+     * @covers \Engelsystem\Http\Response::redirectTo
+     */
+    public function testRedirectTo()
+    {
+        $response = new Response();
+        $newResponse = $response->redirectTo('http://foo.bar/lorem', 301, ['test' => 'ing']);
+
+        $this->assertNotEquals($response, $newResponse);
+        $this->assertEquals(301, $newResponse->getStatusCode());
+        $this->assertArraySubset(
+            [
+                'location' => ['http://foo.bar/lorem'],
+                'test'     => ['ing'],
+            ],
+            $newResponse->getHeaders()
+        );
     }
 }

@@ -25,6 +25,9 @@ function User_settings_view(
     $tshirt_sizes
 ) {
     $personalData = $user_source->personalData;
+    $enable_dect = config('enable_dect');
+    $enable_planned_arrival = config('enable_planned_arrival');
+
     return page_with_title(settings_title(), [
         msg(),
         div('row', [
@@ -33,6 +36,12 @@ function User_settings_view(
                     form_info('', __('Here you can change your user details.')),
                     form_info(entry_required() . ' = ' . __('Entry required!')),
                     form_text('nick', __('Nick'), $user_source->name, true),
+                    form_info(
+                        '',
+                        __('Use up to 23 letters, numbers, connecting punctuations or spaces for your nickname.')
+                    ),
+                    form_text('lastname', __('Last name'), $personalData->last_name),
+                    form_text('prename', __('First name'), $personalData->first_name),
                     form_text('lastname', __('Last name') . ' ' . entry_required(), $personalData->last_name),
                     form_text('prename', __('First name') . ' ' . entry_required(), $personalData->first_name),
                     form_text('street', __('Street + Nr.') . ' ' . entry_required(), $user_source->contact->street),
@@ -43,22 +52,22 @@ function User_settings_view(
                         __('Birthday') . ' ' . entry_required(),
                         $personalData->date_of_birth ? $personalData->date_of_birth->getTimestamp() : ''
                     ),
-                    form_date(
+                    $enable_planned_arrival ? form_date(
                         'planned_arrival_date',
                         __('Planned date of arrival') . ' ' . entry_required(),
                         $personalData->planned_arrival_date ? $personalData->planned_arrival_date->getTimestamp() : '',
                         $buildup_start_date,
                         $teardown_end_date
-                    ),
-                    form_date(
+                    ) : '',
+                    $enable_planned_arrival ? form_date(
                         'planned_departure_date',
                         __('Planned date of departure'),
                         $personalData->planned_departure_date ? $personalData->planned_departure_date->getTimestamp() : '',
                         $buildup_start_date,
                         $teardown_end_date
-                    ),
-                    # form_text('dect', __('DECT'), $user_source->contact->dect),
-                    form_text('mobile', __('Mobile') . ' ' . entry_required(), $user_source->contact->mobile),
+                    ) : '',
+                    $enable_dect ? form_text('dect', __('DECT'), $user_source->contact->dect) : '',
+                    form_text('mobile', __('Mobile'), $user_source->contact->mobile),
                     form_text('mail', __('E-Mail') . ' ' . entry_required(), $user_source->email),
                     form_checkbox(
                         'email_shiftinfo',
@@ -538,7 +547,7 @@ function User_view_worklog($worklog, $admin_user_worklog_privilege)
 
     return [
         'date'       => glyph('calendar') . date('Y-m-d', $worklog['work_timestamp']),
-        'duration'   => '<b>' . sprintf('%.2f', $worklog['work_hours']) . '</b>',
+        'duration'   => sprintf('%.2f', $worklog['work_hours']) . ' h',
         'room'       => '',
         'shift_info' => __('Work log entry'),
         'comment'    => $worklog['comment'] . '<br>'
@@ -626,10 +635,12 @@ function User_view(
                             user_driver_license_edit_link($user_source),
                             glyph('road') . __('driving license')
                         ) : '',
-                        ($admin_user_privilege && !$user_source->state->arrived) ? button(
-                            page_link_to('admin_arrive', ['arrived' => $user_source->id]),
-                            __('arrived')
-                        ) : '',
+                        ($admin_user_privilege && !$user_source->state->arrived) ?
+                            form([
+                                form_hidden('action', 'arrived'),
+                                form_hidden('user', $user_source->id),
+                                form_submit('submit', __('arrived'), '', false, 'default')
+                            ], page_link_to('admin_arrive'), true) : '',
                         $admin_user_privilege ? button(
                             page_link_to(
                                 'users',
@@ -868,12 +879,17 @@ function User_groups_render($user_groups)
  * Render a user nickname.
  *
  * @param array|User $user
+ * @param bool       $plain
  * @return string
  */
-function User_Nick_render($user)
+function User_Nick_render($user, $plain = false)
 {
     if (is_array($user)) {
         $user = (new User())->forceFill($user);
+    }
+
+    if ($plain) {
+        return sprintf('%s (%u)', $user->name, $user->id);
     }
 
     return render_profile_link(
@@ -909,7 +925,7 @@ function render_profile_link($text, $user_id = null, $class = '')
  */
 function render_user_departure_date_hint()
 {
-    if (!auth()->user()->personalData->planned_departure_date) {
+    if (config('enable_planned_arrival') && !auth()->user()->personalData->planned_departure_date) {
         $text = __('Please enter your planned date of departure on your settings page to give us a feeling for teardown capacities.');
         return render_profile_link($text, null, 'alert-link');
     }
@@ -969,7 +985,7 @@ function render_user_tshirt_hint()
 function render_user_dect_hint()
 {
     $user = auth()->user();
-    if ($user->state->arrived && !$user->contact->dect) {
+    if ($user->state->arrived && config('enable_dect') && !$user->contact->dect) {
         $text = __('You need to specify a DECT phone number in your settings! If you don\'t have a DECT phone, just enter \'-\'.');
         return render_profile_link($text, null, 'alert-link');
     }

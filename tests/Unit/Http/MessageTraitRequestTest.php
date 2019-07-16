@@ -2,12 +2,15 @@
 
 namespace Engelsystem\Test\Unit\Http;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Engelsystem\Test\Unit\Http\Stub\MessageTraitRequestImplementation;
+use Nyholm\Psr7\Stream;
 use PHPUnit\Framework\TestCase;
-use Zend\Diactoros\Stream;
 
 class MessageTraitRequestTest extends TestCase
 {
+    use ArraySubsetAsserts;
+
     /**
      * @covers \Engelsystem\Http\MessageTrait::withProtocolVersion
      */
@@ -36,11 +39,7 @@ class MessageTraitRequestTest extends TestCase
      */
     public function testWithBody()
     {
-        /** @var Stream $stream */
-        $stream = new Stream('php://memory', 'wb+');
-        $stream->write('Test content');
-        $stream->rewind();
-
+        $stream = Stream::create('Test content');
         $message = new MessageTraitRequestImplementation();
         $newMessage = $message->withBody($stream);
 

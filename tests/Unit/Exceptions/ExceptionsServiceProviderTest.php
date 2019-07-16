@@ -10,20 +10,20 @@ use Engelsystem\Exceptions\Handlers\LegacyDevelopment;
 use Engelsystem\Exceptions\Handlers\Whoops;
 use Engelsystem\Http\Request;
 use Engelsystem\Test\Unit\ServiceProviderTest;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ExceptionsServiceProviderTest extends ServiceProviderTest
 {
     /**
-     * @covers \Engelsystem\Exceptions\ExceptionsServiceProvider::register()
-     * @covers \Engelsystem\Exceptions\ExceptionsServiceProvider::addProductionHandler()
      * @covers \Engelsystem\Exceptions\ExceptionsServiceProvider::addDevelopmentHandler()
+     * @covers \Engelsystem\Exceptions\ExceptionsServiceProvider::addProductionHandler()
+     * @covers \Engelsystem\Exceptions\ExceptionsServiceProvider::register()
      */
     public function testRegister()
     {
         $app = $this->getApp(['make', 'instance', 'bind']);
 
-        /** @var MockObject|Handler $handler */
+        /** @var Handler|MockObject $handler */
         $handler = $this->createMock(Handler::class);
         $this->setExpects($handler, 'register');
         /** @var Legacy|MockObject $legacyHandler */
@@ -81,10 +81,10 @@ class ExceptionsServiceProviderTest extends ServiceProviderTest
      */
     public function testBoot()
     {
-        /** @var MockObject|Handler $handler */
+        /** @var Handler|MockObject $handler */
         $handler = $this->createMock(Handler::class);
 
-        /** @var MockObject|Request $request */
+        /** @var Request|MockObject $request */
         $request = $this->createMock(Request::class);
 
         $handler->expects($this->once())

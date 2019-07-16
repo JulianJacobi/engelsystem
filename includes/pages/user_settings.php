@@ -24,7 +24,7 @@ function user_settings_main($user_source, $enable_tshirt_size, $tshirt_sizes)
     $valid = true;
     $request = request();
 
-    if ($request->has('mail') && strlen(User_validate_Nick($request->input('mail'))) > 1) {
+    if ($request->has('mail')) {
         $result = User_validate_mail($request->input('mail'));
         $user_source->email = $result->getValue();
         if (!$result->isValid()) {
@@ -70,25 +70,25 @@ function user_settings_main($user_source, $enable_tshirt_size, $tshirt_sizes)
     }
 
     if ($request->has('lastname') && strlen(User_validate_Nick($request->input('lastname'))) > 1) {
-        $user_source->personalData->last_name = strip_request_item('lastname', $user_source['Name']);
+        $user_source->personalData->last_name = strip_request_item('lastname', $user_source->personalData->last_name);
     } else {
         $valid = false;
         error(__('Please enter your last name.'));
     }
     if ($request->has('prename') && strlen(User_validate_Nick($request->input('prename'))) > 1) {
-        $user_source->personalData->first_name = strip_request_item('prename', $user_source['Vorname']);
+        $user_source->personalData->first_name = strip_request_item('prename', $user_source->personalData->first_name);
     } else {
         $valid = false;
         error(__('Please enter your first name.'));
     }
     if (strlen(strip_request_item('dect')) <= 40) {
-        $user_source->contact->dect = strip_request_item('dect', $user_source['DECT']);
+        $user_source->contact->dect = strip_request_item('dect', $user_source->contact->dect);
     } else {
         $valid = false;
         error(__('For dect numbers are only 40 digits allowed.'));
     }
     if ($request->has('mobile') && strlen(User_validate_Nick($request->input('mobile'))) > 1) {
-        $user_source->contact->mobile = strip_request_item('mobile', $user_source['Handy']);
+        $user_source->contact->mobile = strip_request_item('mobile', $user_source->contact->mobile);
     } else {
         $valid = false;
         error(__('Please enter your mobile number.'));

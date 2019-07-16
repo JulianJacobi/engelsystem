@@ -6,8 +6,8 @@ use Engelsystem\Database\Database;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use Illuminate\Database\Connection as DatabaseConnection;
 use PDO;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
 class DatabaseTest extends TestCase
 {
@@ -16,8 +16,8 @@ class DatabaseTest extends TestCase
 
     /**
      * @covers \Engelsystem\Database\Database::__construct()
-     * @covers \Engelsystem\Database\Database::getPdo()
      * @covers \Engelsystem\Database\Database::getConnection()
+     * @covers \Engelsystem\Database\Database::getPdo()
      */
     public function testInit()
     {
@@ -69,7 +69,7 @@ class DatabaseTest extends TestCase
         $this->assertEmpty($return);
 
         $return = $db->selectOne('SELECT * FROM test_data WHERE id = ?', [3]);
-        $this->assertTrue(!is_array($return));
+        $this->assertIsNotArray($return);
     }
 
     /**
@@ -114,7 +114,7 @@ class DatabaseTest extends TestCase
     /**
      * Setup in memory database
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $dbManager = new CapsuleManager();
         $dbManager->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
@@ -129,7 +129,8 @@ class DatabaseTest extends TestCase
                 id INT PRIMARY KEY NOT NULL,
                 data TEXT NOT NULL
             );
-        ');
+            '
+        );
         $connection->statement('CREATE UNIQUE INDEX test_data_id_uindex ON test_data (id);');
         $connection->insert("
             INSERT INTO test_data (id, data)

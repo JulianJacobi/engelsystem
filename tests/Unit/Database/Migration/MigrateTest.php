@@ -15,21 +15,21 @@ class MigrateTest extends TestCase
 {
     /**
      * @covers \Engelsystem\Database\Migration\Migrate::__construct
-     * @covers \Engelsystem\Database\Migration\Migrate::run
      * @covers \Engelsystem\Database\Migration\Migrate::getMigrations
+     * @covers \Engelsystem\Database\Migration\Migrate::run
      * @covers \Engelsystem\Database\Migration\Migrate::setOutput
      */
     public function testRun()
     {
-        /** @var MockObject|Application $app */
+        /** @var Application|MockObject $app */
         $app = $this->getMockBuilder(Application::class)
             ->setMethods(['instance'])
             ->getMock();
-        /** @var MockObject|SchemaBuilder $builder */
+        /** @var SchemaBuilder|MockObject $builder */
         $builder = $this->getMockBuilder(SchemaBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
-        /** @var MockObject|Migrate $migration */
+        /** @var Migrate|MockObject $migration */
         $migration = $this->getMockBuilder(Migrate::class)
             ->setConstructorArgs([$builder, $app])
             ->setMethods(['initMigration', 'getMigrationFiles', 'getMigrated', 'migrate', 'setMigrated'])
@@ -57,6 +57,8 @@ class MigrateTest extends TestCase
                 ['foo/9876_03_22_210000_random_hack.php', '9876_03_22_210000_random_hack', Migrate::UP],
                 ['foo/9999_99_99_999999_another_foo.php', '9999_99_99_999999_another_foo', Migrate::UP],
                 ['foo/9876_03_22_210000_random_hack.php', '9876_03_22_210000_random_hack', Migrate::UP],
+                ['foo/9999_99_99_999999_another_foo.php', '9999_99_99_999999_another_foo', Migrate::UP],
+                ['foo/9876_03_22_210000_random_hack.php', '9876_03_22_210000_random_hack', Migrate::UP],
                 ['foo/4567_11_01_000000_do_stuff.php', '4567_11_01_000000_do_stuff', Migrate::DOWN]
             );
         $migration->expects($this->atLeastOnce())
@@ -65,8 +67,12 @@ class MigrateTest extends TestCase
                 ['9876_03_22_210000_random_hack', Migrate::UP],
                 ['9999_99_99_999999_another_foo', Migrate::UP],
                 ['9876_03_22_210000_random_hack', Migrate::UP],
+                ['9999_99_99_999999_another_foo', Migrate::UP],
+                ['9876_03_22_210000_random_hack', Migrate::UP],
                 ['4567_11_01_000000_do_stuff', Migrate::DOWN]
             );
+
+        $migration->run('foo', Migrate::UP);
 
         $messages = [];
         $migration->setOutput(function ($text) use (&$messages) {
@@ -86,7 +92,7 @@ class MigrateTest extends TestCase
         ) {
             $contains = false;
             foreach ($messages as $message) {
-                if (!Str::contains(strtolower($message), $type) || !Str::contains(strtolower($message), $value)) {
+                if (!Str::contains(mb_strtolower($message), $type) || !Str::contains(mb_strtolower($message), $value)) {
                     continue;
                 }
 
@@ -106,11 +112,11 @@ class MigrateTest extends TestCase
 
     /**
      * @covers \Engelsystem\Database\Migration\Migrate::getMigrated
+     * @covers \Engelsystem\Database\Migration\Migrate::getMigrationFiles
+     * @covers \Engelsystem\Database\Migration\Migrate::getTableQuery
+     * @covers \Engelsystem\Database\Migration\Migrate::initMigration
      * @covers \Engelsystem\Database\Migration\Migrate::migrate
      * @covers \Engelsystem\Database\Migration\Migrate::setMigrated
-     * @covers \Engelsystem\Database\Migration\Migrate::getMigrationFiles
-     * @covers \Engelsystem\Database\Migration\Migrate::initMigration
-     * @covers \Engelsystem\Database\Migration\Migrate::getTableQuery
      */
     public function testRunIntegration()
     {

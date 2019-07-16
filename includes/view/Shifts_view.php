@@ -129,6 +129,13 @@ function Shift_view($shift, $shifttype, $room, $angeltypes_source, ShiftSignupSt
         $content[] = info(__('You are signed up for this shift.'), true);
     }
 
+    if (config('signup_advance_hours') && $shift['start'] > time() + config('signup_advance_hours') * 3600) {
+        $content[] = info(sprintf(
+            _('This shift is in the far future and becomes available for signup at %s.'),
+            date(_('Y-m-d') . ' H:i', $shift['start'] - config('signup_advance_hours') * 3600)
+        ), true);
+    }
+
     $buttons = [];
     if ($shift_admin || $admin_shifttypes || $admin_rooms) {
         $buttons = [
@@ -224,9 +231,10 @@ function Shift_view_render_shift_entry($shift_entry, $user_shift_admin, $angelty
     if ($shift_entry['freeloaded']) {
         $entry = '<del>' . $entry . '</del>';
     }
-    if ($user_shift_admin || $angeltype_supporter) {
+    $isUser = $shift_entry['UID'] == auth()->user()->id;
+    if ($user_shift_admin || $angeltype_supporter || $isUser) {
         $entry .= ' <div class="btn-group">';
-        if ($user_shift_admin) {
+        if ($user_shift_admin || $isUser) {
             $entry .= button_glyph(
                 page_link_to('user_myshifts', ['edit' => $shift_entry['id'], 'id' => $shift_entry['UID']]),
                 'pencil',

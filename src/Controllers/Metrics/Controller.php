@@ -117,7 +117,7 @@ class Controller extends BaseController
                 'type' => 'counter',
                 [
                     'labels' => ['level' => LogLevel::EMERGENCY],
-                    'value'  => $this->stats->logEntries(LogLevel::EMERGENCY)
+                    'value'  => $this->stats->logEntries(LogLevel::EMERGENCY),
                 ],
                 ['labels' => ['level' => LogLevel::ALERT], 'value' => $this->stats->logEntries(LogLevel::ALERT)],
                 ['labels' => ['level' => LogLevel::CRITICAL], 'value' => $this->stats->logEntries(LogLevel::CRITICAL)],
@@ -132,7 +132,13 @@ class Controller extends BaseController
         $data['scrape_duration_seconds'] = [
             'type' => 'gauge',
             'help' => 'Duration of the current request',
-            microtime(true) - $this->request->server->get('REQUEST_TIME_FLOAT', $now)
+            microtime(true) - $this->request->server->get('REQUEST_TIME_FLOAT', $now),
+        ];
+
+        $data['scrape_memory_bytes'] = [
+            'type' => 'gauge',
+            'help' => 'Memory usage of the current request',
+            memory_get_usage(false),
         ];
 
         return $this->response

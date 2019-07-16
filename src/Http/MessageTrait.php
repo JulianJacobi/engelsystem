@@ -2,9 +2,8 @@
 
 namespace Engelsystem\Http;
 
-
+use Nyholm\Psr7\Stream;
 use Psr\Http\Message\StreamInterface;
-use Zend\Diactoros\Stream;
 
 /**
  * @implements \Psr\Http\Message\MessageInterface
@@ -19,7 +18,7 @@ trait MessageTrait
      *
      * @return string HTTP protocol version.
      */
-    public function getProtocolVersion()
+    public function getProtocolVersion(): string
     {
         return parent::getProtocolVersion();
     }
@@ -213,8 +212,7 @@ trait MessageTrait
      */
     public function getBody()
     {
-        $stream = new Stream('php://memory', 'wb+');
-        $stream->write($this->getContent());
+        $stream = Stream::create($this->getContent());
         $stream->rewind();
 
         return $stream;

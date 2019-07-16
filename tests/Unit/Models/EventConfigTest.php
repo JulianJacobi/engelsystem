@@ -102,8 +102,7 @@ class EventConfigTest extends TestCase
      */
     protected function getEventConfig()
     {
-        return new class extends EventConfig
-        {
+        return new class extends EventConfig {
             /**
              * @param string $value
              * @param string $type
@@ -121,7 +120,7 @@ class EventConfigTest extends TestCase
     /**
      * Prepare test
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initDatabase();
     }

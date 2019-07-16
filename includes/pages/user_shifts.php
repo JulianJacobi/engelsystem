@@ -118,7 +118,10 @@ function load_days()
 
     if (empty($days)) {
         error(__('The administration has not configured any shifts yet.'));
-        redirect(page_link_to('/'));
+        // Do not try to redirect to the current page
+        if (config('home_site') != 'user_shifts') {
+            redirect(page_link_to('/'));
+        }
     }
     return $days;
 }
@@ -288,7 +291,7 @@ function ical_hint()
 {
     $user = auth()->user();
 
-    return heading(__('iCal export'), 2)
+    return heading(__('iCal export') . ' ' . button_help('user/ical'), 2)
         . '<p>' . sprintf(
             __('Export your own shifts. <a href="%s">iCal format</a> or <a href="%s">JSON format</a> available (please keep secret, otherwise <a href="%s">reset the api key</a>).'),
             page_link_to('ical', ['key' => $user->api_key]),

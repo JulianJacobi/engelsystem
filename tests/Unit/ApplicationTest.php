@@ -6,8 +6,8 @@ use Engelsystem\Application;
 use Engelsystem\Config\Config;
 use Engelsystem\Container\Container;
 use Engelsystem\Container\ServiceProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use ReflectionClass;
@@ -34,9 +34,9 @@ class ApplicationTest extends TestCase
     }
 
     /**
-     * @covers \Engelsystem\Application::setAppPath
-     * @covers \Engelsystem\Application::registerPaths
      * @covers \Engelsystem\Application::path
+     * @covers \Engelsystem\Application::registerPaths
+     * @covers \Engelsystem\Application::setAppPath
      */
     public function testAppPath()
     {
@@ -125,12 +125,12 @@ class ApplicationTest extends TestCase
 
     /**
      * @covers \Engelsystem\Application::bootstrap
-     * @covers \Engelsystem\Application::isBooted
      * @covers \Engelsystem\Application::getMiddleware
+     * @covers \Engelsystem\Application::isBooted
      */
     public function testBootstrap()
     {
-        /** @var PHPUnit_Framework_MockObject_MockObject|Application $app */
+        /** @var Application|MockObject $app */
         $app = $this->getMockBuilder(Application::class)
             ->setMethods(['register'])
             ->getMock();
@@ -143,6 +143,7 @@ class ApplicationTest extends TestCase
             ->method('register')
             ->with($serviceProvider);
 
+        /** @var Config|MockObject $config */
         $config = $this->getMockBuilder(Config::class)
             ->getMock();
 
@@ -168,7 +169,7 @@ class ApplicationTest extends TestCase
     /**
      * @param Application $app
      * @param array       $methods
-     * @return PHPUnit_Framework_MockObject_MockObject|ServiceProvider
+     * @return ServiceProvider|MockObject
      */
     protected function mockServiceProvider(Application $app, $methods = [])
     {

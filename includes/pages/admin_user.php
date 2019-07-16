@@ -59,7 +59,9 @@ function admin_user()
         $html .= '  <tr><td>Postleitzahl</td><td><input size="40" name="eZipCode" value="' . $user_source->contact->zip_code . '" class="form-control"></td></tr>' . "\n";
         $html .= '  <tr><td>Stadt</td><td><input size="40" name="eHometown" value="' . $user_source->contact->hometown . '" class="form-control"></td></tr>' . "\n";
         $html .= '  <tr><td>Handy</td><td>' . '<input type= "tel" size="40" name="eHandy" value="' . $user_source->contact->mobile . '" class="form-control"></td></tr>' . "\n";
-        //$html .= '  <tr><td>DECT</td><td>' . '<input size="40" name="eDECT" value="' . $user_source->contact->dect . '" class="form-control"></td></tr>' . "\n";
+        if (config('enable_dect')) {
+            $html .= '  <tr><td>DECT</td><td>' . '<input size="40" name="eDECT" value="' . $user_source->contact->dect . '" class="form-control"></td></tr>' . "\n";
+        }
         if ($user_source->settings->email_human) {
             $html .= "  <tr><td>email</td><td>" . '<input type="email" size="40" name="eemail" value="' . $user_source->email . '" class="form-control"></td></tr>' . "\n";
         }
@@ -83,7 +85,7 @@ function admin_user()
 
         // Gekommen?
         $html .= '  <tr><td>Gekommen</td><td>' . "\n";
-        if($user_source->state->arrived) {
+        if ($user_source->state->arrived) {
             $html .= _('Yes');
         } else {
             $html .= _('No');
@@ -246,7 +248,7 @@ function admin_user()
                         }
                         $user_source = User::find($user_id);
                         engelsystem_log(
-                            'Set groups of ' . User_Nick_render($user_source) . ' to: '
+                            'Set groups of ' . User_Nick_render($user_source, true) . ' to: '
                             . join(', ', $user_groups_info)
                         );
                         $html .= success('Benutzergruppen gespeichert.', true);
@@ -267,7 +269,10 @@ function admin_user()
                 if ($user_source->settings->email_human) {
                     $user_source->email = $request->postData('eemail');
                 }
-                $user_source->name = User_validate_Nick($request->postData('eNick'));
+                $nickValidation = User_validate_Nick($request->postData('eNick'));
+                if($nickValidation->isValid()) {
+                    $user_source->name = $nickValidation->getValue();
+                }
                 $user_source->save();
                 $user_source->personalData->first_name = $request->postData('eVorname');
                 $user_source->personalData->last_name = $request->postData('eName');
@@ -303,7 +308,7 @@ function admin_user()
                 ) {
                     set_password($user_id, $request->postData('new_pw'));
                     $user_source = User::find($user_id);
-                    engelsystem_log('Set new password for ' . User_Nick_render($user_source));
+                    engelsystem_log('Set new password for ' . User_Nick_render($user_source, true));
                     $html .= success('Passwort neu gesetzt.', true);
                 } else {
                     $html .= error(

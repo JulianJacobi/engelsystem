@@ -11,8 +11,8 @@ use Engelsystem\Http\Request;
 use Engelsystem\Http\Response;
 use Engelsystem\Http\UrlGeneratorInterface;
 use Engelsystem\Renderer\Renderer;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface as StorageInterface;
 
@@ -55,11 +55,11 @@ class HelpersTest extends TestCase
     }
 
     /**
-     * @covers \base_path()
+     * @covers \base_path
      */
     public function testBasePath()
     {
-        /** @var MockObject|Application $app */
+        /** @var Application|MockObject $app */
         $app = $this->getMockBuilder(Container::class)
             ->getMock();
         Application::setInstance($app);
@@ -99,11 +99,11 @@ class HelpersTest extends TestCase
     }
 
     /**
-     * @covers \config_path()
+     * @covers \config_path
      */
     public function testConfigPath()
     {
-        /** @var MockObject|Application $app */
+        /** @var Application|MockObject $app */
         $app = $this->getMockBuilder(Container::class)
             ->getMock();
         Application::setInstance($app);
@@ -115,20 +115,6 @@ class HelpersTest extends TestCase
 
         $this->assertEquals('/foo/conf', config_path());
         $this->assertEquals('/foo/conf/bar.php', config_path('bar.php'));
-    }
-
-    /**
-     * @covers \env
-     */
-    public function testEnv()
-    {
-        putenv('envTestVar=someContent');
-
-        $env = env('envTestVar');
-        $this->assertEquals('someContent', $env);
-
-        $env = env('someRandomEnvVarThatShouldNeverExist', 'someDefaultValue');
-        $this->assertEquals('someDefaultValue', $env);
     }
 
     /**
@@ -155,7 +141,7 @@ class HelpersTest extends TestCase
      */
     public function testResponse()
     {
-        /** @var MockObject|Response $response */
+        /** @var Response|MockObject $response */
         $response = $this->getMockBuilder(Response::class)->getMock();
         $this->getAppMock('psr7.response', $response);
 
@@ -174,7 +160,7 @@ class HelpersTest extends TestCase
             ->withConsecutive(['lor', 'em'], ['foo', 'bar'])
             ->willReturn($response);
 
-        $this->assertEquals($response, response('Lorem Ipsum?', 501, ['lor' => 'em', 'foo' => 'bar',]));
+        $this->assertEquals($response, response('Lorem Ipsum?', 501, ['lor' => 'em', 'foo' => 'bar']));
     }
 
     /**
@@ -285,6 +271,7 @@ class HelpersTest extends TestCase
      */
     protected function getAppMock($alias, $object)
     {
+        /** @var Application|MockObject $appMock */
         $appMock = $this->getMockBuilder(Container::class)
             ->getMock();
 
@@ -293,7 +280,6 @@ class HelpersTest extends TestCase
             ->with($alias)
             ->willReturn($object);
 
-        /** @var $appMock Application */
         Application::setInstance($appMock);
 
         return $appMock;

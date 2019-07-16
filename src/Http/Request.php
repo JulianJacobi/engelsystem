@@ -2,13 +2,13 @@
 
 namespace Engelsystem\Http;
 
+use Nyholm\Psr7\UploadedFile;
+use Nyholm\Psr7\Uri;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
-use Zend\Diactoros\UploadedFile;
-use Zend\Diactoros\Uri;
 
 class Request extends SymfonyRequest implements ServerRequestInterface
 {
@@ -328,15 +328,14 @@ class Request extends SymfonyRequest implements ServerRequestInterface
     public function getUploadedFiles()
     {
         $files = [];
+        /** @var SymfonyFile $file */
         foreach ($this->files as $file) {
-            /** @var SymfonyFile $file */
-
             $files[] = new UploadedFile(
-                $file->getPath(),
+                $file->getRealPath(),
                 $file->getSize(),
                 $file->getError(),
                 $file->getClientOriginalName(),
-                $file->getClientMimeType()
+                $file->getMimeType()
             );
         }
 
@@ -371,7 +370,6 @@ class Request extends SymfonyRequest implements ServerRequestInterface
                 $filename,
                 $file->getClientFilename(),
                 $file->getClientMediaType(),
-                $file->getSize(),
                 $file->getError()
             );
         }
@@ -464,10 +462,10 @@ class Request extends SymfonyRequest implements ServerRequestInterface
      * This method obviates the need for a hasAttribute() method, as it allows
      * specifying a default value to return if the attribute is not found.
      *
-     * @see getAttributes()
      * @param string $name    The attribute name.
      * @param mixed  $default Default value to return if the attribute does not exist.
      * @return mixed
+     * @see getAttributes()
      */
     public function getAttribute($name, $default = null)
     {
@@ -484,10 +482,10 @@ class Request extends SymfonyRequest implements ServerRequestInterface
      * immutability of the message, and MUST return an instance that has the
      * updated attribute.
      *
-     * @see getAttributes()
      * @param string $name  The attribute name.
      * @param mixed  $value The value of the attribute.
      * @return static
+     * @see getAttributes()
      */
     public function withAttribute($name, $value)
     {
@@ -509,9 +507,9 @@ class Request extends SymfonyRequest implements ServerRequestInterface
      * immutability of the message, and MUST return an instance that removes
      * the attribute.
      *
-     * @see getAttributes()
      * @param string $name The attribute name.
      * @return static
+     * @see getAttributes()
      */
     public function withoutAttribute($name)
     {

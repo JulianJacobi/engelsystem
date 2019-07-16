@@ -25,14 +25,6 @@ function register_title()
 }
 
 /**
- * @return string
- */
-function logout_title()
-{
-    return __('Logout');
-}
-
-/**
  * Engel registrieren
  *
  * @return string
@@ -42,6 +34,8 @@ function guest_register()
     $authUser = auth()->user();
     $tshirt_sizes = config('tshirt_sizes');
     $enable_tshirt_size = config('enable_tshirt_size');
+    $enable_dect = config('enable_dect');
+    $enable_planned_arrival = config('enable_planned_arrival');
     $min_password_length = config('min_password_length');
     $config = config();
     $request = request();
@@ -90,18 +84,22 @@ function guest_register()
     if ($request->hasPostData('submit')) {
         $valid = true;
 
-        if ($request->has('nick') && strlen(User_validate_Nick($request->input('nick'))) > 1) {
-            $nick = User_validate_Nick($request->input('nick'));
+        if ($request->has('nick')) {
+            $nickValidation = User_validate_Nick($request->input('nick'));
+            $nick = $nickValidation->getValue();
+
+            if (!$nickValidation->isValid()) {
+                $valid = false;
+                $msg .= error(sprintf(__('Please enter a valid nick.') . ' ' . __('Use up to 23 letters, numbers, connecting punctuations or spaces for your nickname.'),
+                    $nick), true);
+            }
             if (User::whereName($nick)->count() > 0) {
                 $valid = false;
                 $msg .= error(sprintf(__('Your nick &quot;%s&quot; already exists.'), $nick), true);
             }
         } else {
             $valid = false;
-            $msg .= error(sprintf(
-                __('Your nick &quot;%s&quot; is too short (min. 2 characters).'),
-                User_validate_Nick($request->input('nick'))
-            ), true);
+            $msg .= error(__('Please enter a nickname.'), true);
         }
 
         if ($request->has('mail') && strlen(strip_request_item('mail')) > 0) {
@@ -149,7 +147,7 @@ function guest_register()
             ), true);
         }
 
-        if ($request->has('planned_arrival_date')) {
+        if ($request->has('planned_arrival_date') && $enable_planned_arrival) {
             $tmp = parse_date('Y-m-d H:i', $request->input('planned_arrival_date') . ' 00:00');
             $result = User_validate_planned_arrival_date($tmp);
             $planned_arrival_date = $result->getValue();
@@ -157,7 +155,7 @@ function guest_register()
                 $valid = false;
                 error(__('Please enter your planned date of arrival. It should be after the buildup start date and before teardown end date.'));
             }
-        } else {
+        } elseif ($enable_planned_arrival) {
             $valid = false;
             error(__('Please enter your planned date of arrival. It should be after the buildup start date and before teardown end date.'));
         }
@@ -224,7 +222,7 @@ function guest_register()
             $valid = false;
             error(__('Please enter your first name.'));
         }
-        if ($request->has('dect')) {
+        if ($enable_dect && $request->has('dect')) {
             if (strlen(strip_request_item('dect')) <= 40) {
                 $dect = strip_request_item('dect');
             } else {
@@ -232,7 +230,7 @@ function guest_register()
                 error(__('For dect numbers are only 40 digits allowed.'));
             }
         }
-        if ($request->has('mobile') && strlen(User_validate_Nick($request->input('mobile'))) > 1) {
+        if ($request->has('mobile')) {
             $mobile = strip_request_item('mobile');
         } else {
             $valid = false;
@@ -274,7 +272,7 @@ function guest_register()
                 'first_name'           => $preName,
                 'last_name'            => $lastName,
                 'shirt_size'           => $tshirt_size,
-                'planned_arrival_date' => Carbon::createFromTimestamp($planned_arrival_date),
+                'planned_arrival_date' => $enable_planned_arrival ? Carbon::createFromTimestamp($planned_arrival_date) : null,
                 'date_of_birth'        => Carbon::createFromTimestamp($date_of_birth),
                 'allergies'            => $allergies,
                 'medicines'            => $medicines,
@@ -293,7 +291,12 @@ function guest_register()
                 ->associate($user)
                 ->save();
 
-            (new State())->user()
+            $state = new State([]);
+            if (config('autoarrive')) {
+                $state->arrived = true;
+                $state->arrival_date = new Carbon();
+            }
+            $state->user()
                 ->associate($user)
                 ->save();
 
@@ -312,7 +315,7 @@ function guest_register()
             }
 
             engelsystem_log(
-                'User ' . User_Nick_render($user)
+                'User ' . User_Nick_render($user, true)
                 . ' signed up as: ' . join(', ', $user_angel_types_info)
             );
             success(__('Angel registration successful!'));
@@ -352,7 +355,9 @@ function guest_register()
                 div('col-md-6', [
                     div('row', [
                         div('col-sm-4', [
-                            form_text('nick', __('Nick') . ' ' . entry_required(), $nick)
+                            form_text('nick', __('Nick') . ' ' . entry_required(), $nick),
+                            form_info('',
+                                __('Use up to 23 letters, numbers, connecting punctuations or spaces for your nickname.'))
                         ]),
                         div('col-sm-8', [
                             form_email('mail', __('E-Mail') . ' ' . entry_required(), $mail),
@@ -372,13 +377,13 @@ function guest_register()
                         ])
                     ]),
                     div('row', [
-                        div('col-sm-6', [
+                        $enable_planned_arrival ? div('col-sm-6', [
                             form_date(
                                 'planned_arrival_date',
                                 __('Planned date of arrival') . ' ' . entry_required(),
                                 $planned_arrival_date, $buildup_start_date, $teardown_end_date
                             )
-                        ]),
+                        ]) : '',
                         div('col-sm-6', [
                             $enable_tshirt_size ? form_select('tshirt_size',
                                 __('Shirt size') . ' ' . entry_required(),
@@ -410,16 +415,11 @@ function guest_register()
                 ]),
                 div('col-md-6', [
                     div('row', [
-                        /*
-                        div('col-sm-4', [
+                        $enable_dect ? div('col-sm-4', [
                             form_text('dect', __('DECT'), $dect)
-                        ]),
-                        */
-                        div('col-sm-6', [
-                            form_text('mobile', __('Mobile') . ' ' . entry_required(), $mobile)
-                        ]),
-                        div('col-sm-6', [
-                            form_date('date_of_birth', __('Birthday') . ' ' . entry_required(), $date_of_birth)
+                        ]) : '',
+                        div($enable_dect ? 'col-sm-4' : 'col-sm-12', [
+                            form_text('mobile', __('Mobile'), $mobile)
                         ]),
                     ]),
                     div('row', [
@@ -477,16 +477,6 @@ function entry_required()
 }
 
 /**
- * @return bool
- */
-function guest_logout()
-{
-    session()->invalidate();
-    redirect(page_link_to('start'));
-    return true;
-}
-
-/**
  * @return string
  */
 function guest_login()
@@ -499,10 +489,11 @@ function guest_login()
     $session->remove('uid');
 
     if ($request->hasPostData('submit')) {
-        if ($request->has('nick') && strlen(User_validate_Nick($request->input('nick'))) > 0) {
-            $nick = User_validate_Nick($request->input('nick'));
+        if ($request->has('nick') && !empty($request->input('nick'))) {
+            $nickValidation = User_validate_Nick($request->input('nick'));
+            $nick = $nickValidation->getValue();
             /** @var User $login_user */
-            $login_user = User::whereName($nick)->first();
+            $login_user = User::whereName($nickValidation->getValue())->first();
             if ($login_user) {
                 if ($request->has('password')) {
                     if (!verify_password($request->postData('password'), $login_user->password, $login_user->id)) {
@@ -532,7 +523,7 @@ function guest_login()
             $session->set('uid', $login_user->id);
             $session->set('locale', $login_user->settings->language);
 
-            redirect(page_link_to('news'));
+            redirect(page_link_to(config('home_site')));
         }
     }
 

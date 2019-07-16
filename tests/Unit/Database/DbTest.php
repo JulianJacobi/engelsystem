@@ -6,26 +6,26 @@ use Engelsystem\Database\Db;
 use Illuminate\Database\Capsule\Manager as CapsuleManager;
 use Illuminate\Database\Connection as DatabaseConnection;
 use PDO;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
 class DbTest extends TestCase
 {
     /**
-     * @covers \Engelsystem\Database\Db::setDbManager()
      * @covers \Engelsystem\Database\Db::connection()
+     * @covers \Engelsystem\Database\Db::setDbManager()
      */
     public function testSetDbManager()
     {
-        /** @var MockObject|Pdo $pdo */
+        /** @var Pdo|MockObject $pdo */
         $pdo = $this->getMockBuilder(Pdo::class)
             ->disableOriginalConstructor()
             ->getMock();
-        /** @var MockObject|CapsuleManager $dbManager */
+        /** @var CapsuleManager|MockObject $dbManager */
         $dbManager = $this->getMockBuilder(CapsuleManager::class)
             ->disableOriginalConstructor()
             ->getMock();
-        /** @var MockObject|DatabaseConnection $dbManager */
+        /** @var DatabaseConnection|MockObject $dbManager */
         $databaseConnection = $this->getMockBuilder(DatabaseConnection::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -69,7 +69,7 @@ class DbTest extends TestCase
 
         $return = Db::selectOne('SELECT * FROM test_data WHERE id = ?', [3]);
         $return = array_pop($return);
-        $this->assertTrue(!is_array($return));
+        $this->assertIsNotArray($return);
     }
 
     /**
@@ -117,7 +117,7 @@ class DbTest extends TestCase
     /**
      * Setup in memory database
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $dbManager = new CapsuleManager();
         $dbManager->addConnection(['driver' => 'sqlite', 'database' => ':memory:']);
@@ -132,7 +132,8 @@ class DbTest extends TestCase
                 id INT PRIMARY KEY NOT NULL,
                 data TEXT NOT NULL
             );
-        ');
+            '
+        );
         Db::connection()->statement('CREATE UNIQUE INDEX test_data_id_uindex ON test_data (id);');
         Db::insert("
             INSERT INTO test_data (id, data)

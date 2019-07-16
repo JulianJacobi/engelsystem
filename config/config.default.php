@@ -32,6 +32,9 @@ return [
         'Contact' => env('CONTACT_EMAIL', 'mailto:ticket@c3heaven.de'),
     ],
 
+    // Link to documentation/help
+    'documentation_url'       => 'https://engelsystem.de/doc/',
+
     // Email config
     'email'                   => [
         // Can be mail, smtp, sendmail or log
@@ -39,12 +42,12 @@ return [
         'from'   => [
             // From address of all emails
             'address' => env('MAIL_FROM_ADDRESS', 'noreply@engelsystem.de'),
-            'name'    => env('MAIL_FROM_NAME', env('APP_NAME', 'Engelsystem'))
+            'name'    => env('MAIL_FROM_NAME', env('APP_NAME', 'Engelsystem')),
         ],
 
         'host'       => env('MAIL_HOST', 'localhost'),
         'port'       => env('MAIL_PORT', 587),
-        // Transport encryption like tls
+        // Transport encryption like tls (for starttls) or ssl
         'encryption' => env('MAIL_ENCRYPTION', null),
         'username'   => env('MAIL_USERNAME'),
         'password'   => env('MAIL_PASSWORD'),
@@ -56,12 +59,16 @@ return [
 
     // Available themes
     'available_themes'        => [
+        '10' => 'Engelsystem cccamp19 green (2019)',
+        '9' => 'Engelsystem cccamp19 yellow (2019)',
+        '8' => 'Engelsystem cccamp19 blue (2019)',
         '7' => 'Engelsystem 35c3 dark (2018)',
         '6' => 'Engelsystem 34c3 dark (2017)',
         '5' => 'Engelsystem 34c3 light (2017)',
         '4' => 'Engelsystem 33c3 (2016)',
         '3' => 'Engelsystem 32c3 (2015)',
         '2' => 'Engelsystem cccamp15',
+        '11' => 'Engelsystem high contrast',
         '0' => 'Engelsystem light',
         '1' => 'Engelsystem dark',
     ],
@@ -69,14 +76,25 @@ return [
     // Rewrite URLs with mod_rewrite
     'rewrite_urls'            => true,
 
+    // Redirect to this site after logging in or when pressing the top-left button
+    // Must be one of news, user_meetings, user_shifts, angeltypes, user_questions
+    'home_site'               => 'news',
+
     // Number of News shown on one site
-    'display_news'            => 6,
+    'display_news'            => 10,
 
     // Users are able to sign up
     'registration_enabled'    => (bool)env('REGISTRATION_ENABLED', true),
 
     // Only arrived angels can sign up for shifts
     'signup_requires_arrival' => false,
+
+    // Whether newly-registered user should automatically be marked as arrived
+    'autoarrive'              => false,
+
+    // Only allow shift signup this number of hours in advance
+    // Setting this to 0 disables the feature
+    'signup_advance_hours'    => 0,
 
     // Number of hours that an angel has to sign out own shifts
     'last_unsubscribe'        => 3,
@@ -92,6 +110,12 @@ return [
     // The minimum length for passwords
     'min_password_length'     => 8,
 
+    // Whether the DECT field should be enabled
+    'enable_dect'             => true,
+
+    // Enables the planned arrival/leave date
+    'enable_planned_arrival'  => true,
+
     // Enables the T-Shirt configuration on signup and profile
     'enable_tshirt_size'      => true,
 
@@ -99,7 +123,7 @@ return [
     'max_freeloadable_shifts' => 2,
 
     // Local timezone
-    'timezone'                => env('TIMEZONE', 'Europe/Berlin'),
+    'timezone'                => env('TIMEZONE', ini_get('date.timezone') ?: 'Europe/Berlin'),
 
     // Multiply 'night shifts' and freeloaded shifts (start or end between 2 and 6 exclusive) by 2
     'night_shifts'            => [

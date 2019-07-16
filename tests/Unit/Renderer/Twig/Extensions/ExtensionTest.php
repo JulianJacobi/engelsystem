@@ -2,6 +2,7 @@
 
 namespace Engelsystem\Test\Unit\Renderer\Twig\Extensions;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Twig_Function as TwigFunction;
@@ -9,6 +10,8 @@ use Twig_Node as TwigNode;
 
 abstract class ExtensionTest extends TestCase
 {
+    use ArraySubsetAsserts;
+
     /**
      * Assert that a twig filter was registered
      *
@@ -36,6 +39,7 @@ abstract class ExtensionTest extends TestCase
      * @param string         $name
      * @param callable       $callback
      * @param TwigFunction[] $functions
+     * @param array $options
      */
     protected function assertExtensionExists($name, $callback, $functions, $options = [])
     {

@@ -3,27 +3,44 @@
 namespace Engelsystem\Http;
 
 use Engelsystem\Container\ServiceProvider;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
-
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UploadedFileFactoryInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
+use Symfony\Bridge\PsrHttpMessage\HttpMessageFactoryInterface;
 
 class Psr7ServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        /** @var DiactorosFactory $psr7Factory */
-        $psr7Factory = $this->app->make(DiactorosFactory::class);
-        $this->app->instance('psr7.factory', $psr7Factory);
+        $psr17Factory = Psr17Factory::class;
 
-        /** @var Request $request */
-        $request = $this->app->get('request');
-        $this->app->instance('psr7.request', $request);
+        foreach (
+            [
+                'psr7.factory.request',
+                ServerRequestFactoryInterface::class,
+                'psr7.factory.response',
+                ResponseFactoryInterface::class,
+                'psr7.factory.upload',
+                UploadedFileFactoryInterface::class,
+                'psr7.factory.stream',
+                StreamFactoryInterface::class,
+            ] as $alias
+        ) {
+            $this->app->bind($alias, $psr17Factory);
+        }
+
+        $this->app->bind('psr7.factory', PsrHttpFactory::class);
+        $this->app->bind(HttpMessageFactoryInterface::class, PsrHttpFactory::class);
+
+        $this->app->bind('psr7.request', 'request');
         $this->app->bind(ServerRequestInterface::class, 'psr7.request');
 
-        /** @var Response $response */
-        $response = $this->app->get('response');
-        $this->app->instance('psr7.response', $response);
+        $this->app->bind('psr7.response', 'response');
         $this->app->bind(ResponseInterface::class, 'psr7.response');
     }
 }

@@ -8,6 +8,7 @@ use Engelsystem\Test\Feature\ApplicationFeatureTest;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use stdClass;
 
 class EngelsystemLoggerTest extends ApplicationFeatureTest
 {
@@ -20,6 +21,9 @@ class EngelsystemLoggerTest extends ApplicationFeatureTest
         return new EngelsystemLogger($logEntry);
     }
 
+    /**
+     * @covers \Engelsystem\Logger\EngelsystemLogger::__construct
+     */
     public function testImplements()
     {
         $this->assertInstanceOf(LoggerInterface::class, $this->getLogger());
@@ -43,6 +47,7 @@ class EngelsystemLoggerTest extends ApplicationFeatureTest
     }
 
     /**
+     * @covers       \Engelsystem\Models\LogEntry
      * @dataProvider provideLogLevels
      * @param string $level
      */
@@ -58,6 +63,9 @@ class EngelsystemLoggerTest extends ApplicationFeatureTest
         $this->assertCount(2, $entries);
     }
 
+    /**
+     * @covers \Engelsystem\Logger\EngelsystemLogger::log
+     */
     public function testContextReplacement()
     {
         LogEntry::query()->truncate();
@@ -78,12 +86,14 @@ class EngelsystemLoggerTest extends ApplicationFeatureTest
         return [
             ['Data and {context}', [], 'Data and {context}'],
             ['Data and {context}', ['context' => null], 'Data and '],
-            ['Data and {context}', ['context' => new \stdClass()], 'Data and {context}'],
+            ['Data and {context}', ['context' => new stdClass()], 'Data and {context}'],
             ['Some user asked: {question}', ['question' => 'Foo?'], 'Some user asked: Foo?'],
         ];
     }
 
     /**
+     * @covers       \Engelsystem\Logger\EngelsystemLogger::interpolate
+     * @covers       \Engelsystem\Logger\EngelsystemLogger::log
      * @dataProvider provideContextReplaceValues
      *
      * @param string   $message
@@ -99,6 +109,9 @@ class EngelsystemLoggerTest extends ApplicationFeatureTest
         $this->assertEquals($expected, $entry['message']);
     }
 
+    /**
+     * @covers \Engelsystem\Logger\EngelsystemLogger::log
+     */
     public function testContextToString()
     {
         LogEntry::query()->truncate();
@@ -119,19 +132,21 @@ class EngelsystemLoggerTest extends ApplicationFeatureTest
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @covers \Engelsystem\Logger\EngelsystemLogger::checkLevel
+     * @covers \Engelsystem\Logger\EngelsystemLogger::log
      */
     public function testThrowExceptionOnInvalidLevel()
     {
         $logger = $this->getLogger();
 
+        $this->expectException(InvalidArgumentException::class);
         $logger->log('This log level should never be defined', 'Some message');
     }
 
     /**
      * @return array
      */
-    public function getLastEntry()
+    protected function getLastEntry()
     {
         $entries = LogEntry::all();
         $entry = $entries->last();
@@ -139,7 +154,10 @@ class EngelsystemLoggerTest extends ApplicationFeatureTest
         return $entry;
     }
 
-    public function tearDown()
+    /**
+     * Cleanup
+     */
+    protected function tearDown(): void
     {
         LogEntry::query()->truncate();
     }

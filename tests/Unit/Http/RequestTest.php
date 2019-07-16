@@ -3,8 +3,9 @@
 namespace Engelsystem\Test\Unit\Http;
 
 use Engelsystem\Http\Request;
+use Nyholm\Psr7\UploadedFile;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
@@ -89,7 +90,7 @@ class RequestTest extends TestCase
      */
     public function testPath()
     {
-        /** @var MockObject|Request $request */
+        /** @var Request|MockObject $request */
         $request = $this
             ->getMockBuilder(Request::class)
             ->setMethods(['getPathInfo'])
@@ -112,7 +113,7 @@ class RequestTest extends TestCase
      */
     public function testUrl()
     {
-        /** @var MockObject|Request $request */
+        /** @var Request|MockObject $request */
         $request = $this
             ->getMockBuilder(Request::class)
             ->setMethods(['getUri'])
@@ -162,7 +163,7 @@ class RequestTest extends TestCase
             [
                 '*',
                 '/foo/bar',
-                'https://lorem.ipsum/test?lor=em'
+                'https://lorem.ipsum/test?lor=em',
             ] as $target
         ) {
             $new = $request->withRequestTarget($target);
@@ -285,7 +286,7 @@ class RequestTest extends TestCase
     {
         $filename = tempnam(sys_get_temp_dir(), 'test');
         file_put_contents($filename, 'LoremIpsum!');
-        $files = [new SymfonyFile($filename, 'foo.html', 'text/html', 11)];
+        $files = [new SymfonyFile($filename, 'foo.txt', 'text/plain', UPLOAD_ERR_PARTIAL)];
         $request = new Request([], [], [], [], $files);
 
         $uploadedFiles = $request->getUploadedFiles();
@@ -294,9 +295,10 @@ class RequestTest extends TestCase
         /** @var UploadedFileInterface $file */
         $file = $uploadedFiles[0];
         $this->assertInstanceOf(UploadedFileInterface::class, $file);
-        $this->assertEquals('foo.html', $file->getClientFilename());
-        $this->assertEquals('text/html', $file->getClientMediaType());
+        $this->assertEquals('foo.txt', $file->getClientFilename());
+        $this->assertEquals('text/plain', $file->getClientMediaType());
         $this->assertEquals(11, $file->getSize());
+        $this->assertEquals(UPLOAD_ERR_PARTIAL, $file->getError());
     }
 
     /**
@@ -306,7 +308,7 @@ class RequestTest extends TestCase
     {
         $filename = tempnam(sys_get_temp_dir(), 'test');
         file_put_contents($filename, 'LoremIpsum!');
-        $file = new \Zend\Diactoros\UploadedFile($filename, 11, UPLOAD_ERR_OK, 'test.txt', 'text/plain');
+        $file = new UploadedFile($filename, 11, UPLOAD_ERR_OK, 'test.txt', 'text/plain');
 
         $request = new Request();
         $new = $request->withUploadedFiles([$file]);
@@ -367,7 +369,7 @@ class RequestTest extends TestCase
         $request = new Request([], [], $attributes);
 
         $this->assertEquals($attributes['ipsum'], $request->getAttribute('ipsum'));
-        $this->assertEquals(null, $request->getAttribute('dolor'));
+        $this->assertNull($request->getAttribute('dolor'));
         $this->assertEquals(1234, $request->getAttribute('test', 1234));
     }
 

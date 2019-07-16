@@ -13,16 +13,25 @@ To report bugs use [engelsystem/issues](https://github.com/engelsystem/engelsyst
 ### Requirements
  * PHP >= 7.1
    * Required modules:
+     * dom
      * gettext
      * json
+     * mbstring
      * PDO
+       * mysql
+     * tokenizer
      * xml/libxml/SimpleXML
+     * xmlwriter
  * MySQL-Server >= 5.7.8 or MariaDB-Server >= 10.2.2
  * Webserver, i.e. lighttpd, nginx, or Apache
 
 ### Additional requirements if you want to build the project by yourself
  * Node >= 8 (Development/Building only)
  * Yarn (Development/Building only)
+ * PHP Composer (Development/Building only)
+
+#### This should be included in your node install
+ * npm (Development/Building only)
 
 ### Download
 
@@ -129,6 +138,9 @@ For usage see `./bin/deploy.sh -h`
 The `bin/migrate` script can be used to import and update the database of the engelsystem.
 
 For more information on how to use it call `./bin/migrate help`
+
+### Translation
+We use gettext. You may use POEdit to extract new texts from the sourcecode. Please config POEdit to extract also the twig template files using the following settings: https://gist.github.com/jlambe/a868d9b63d70902a12254ce47069d0e6
 
 ### Codestyle
 Please ensure that your pull requests follow [PSR-2](http://www.php-fig.org/psr/psr-2/) and [PSR-4](http://www.php-fig.org/psr/psr-4/).
