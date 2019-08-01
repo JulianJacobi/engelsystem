@@ -504,14 +504,14 @@ function guest_login()
                     $valid = false;
                     error(__('Please enter a password.'));
                 }
+
+                if (!$login_user->state->unlocked) {
+                    $valid = false;
+                    error(__('Your account is currently locked, before you can login to the system you must be unlocked by one of our admins.'));
+                }
             } else {
                 $valid = false;
                 error(__('No user was found with that Nickname. Please try again. If you are still having problems, ask a Dispatcher.'));
-            }
-
-            if (!$login_user->state->unlocked) {
-                $valid = false;
-                error(__('Your account is currently locked, before you can login to the system you must be unlocked by one of our admins.'));
             }
 
         } else {
